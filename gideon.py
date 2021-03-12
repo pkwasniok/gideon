@@ -6,8 +6,10 @@ import json
 from datetime import datetime
 import os
 
+DIR = os.path.abspath(__file__)
+
 # Credentials
-load_dotenv(os.path.dirname(os.path.abspath(__file__)) + "\.env")
+load_dotenv(DIR + "/.env")
 TOKEN = os.getenv("TOKEN")
 
 # Variables
@@ -21,7 +23,7 @@ minutes = 0
 time = 0
 
 # Loadin json file
-with open("C://repos/Gideon/config.json", encoding="utf-8") as json_file:
+with open(DIR + "/config.json", encoding="utf-8") as json_file:
     data = json.load(json_file)
 
 # Loading timetable from json file
