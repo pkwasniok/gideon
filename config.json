@@ -1,0 +1,73 @@
+{
+    "timetable": [
+        {
+            "day": "Poniedziałek",
+            "day_number": 0,
+            "lessons": [
+                "Mateamtyka",
+                "Mateamtyka",
+                "Filozofia",
+                "Wos",
+                "Polski",
+                "Polski",
+                "Religia",
+                "Niemiecki"
+            ]
+        },
+        {
+            "day": "Wtorek",
+            "day_number": 1,
+            "lessons": [
+                "",
+                "Polski",
+                "Edb",
+                "Historia",
+                "Matematyka",
+                "Angielski",
+                "Angielski",
+                "Informatyka"
+            ]
+        },
+        {
+            "day": "Środa",
+            "day_number": 2,
+            "lessons": [
+                "Angielski",
+                "Mateamtyka",
+                "Historia",
+                "Geografia",
+                "Fizyka",
+                "Religia",
+                "Informatyka"
+            ]
+        },
+        {
+            "day": "Czwartek",
+            "day_number": 3,
+            "lessons": [
+                "Mateamtyka",
+                "Niemiecki",
+                "Wychowawcza",
+                "Biologia",
+                "Wf",
+                "Wf",
+                "Polski",
+                "Infomratyka"
+            ]
+        },
+        {
+            "day": "Piątek",
+            "day_number": 4,
+            "lessons": [
+                "Mateamtyka",
+                "Mateamtyka",
+                "Filozofia",
+                "Wos",
+                "Polski",
+                "Polski",
+                "Religia",
+                "Niemiecki"
+            ]
+        }
+    ]
+}
