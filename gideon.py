@@ -3,26 +3,66 @@ from dotenv import load_dotenv
 import discord
 import asyncio
 import json
+from datetime import datetime
 import os
 
 # Credentials
 load_dotenv(os.path.dirname(os.path.abspath(__file__)) + "\.env")
 TOKEN = os.getenv("TOKEN")
 
-# loadin json config file
-with open("C://repos/Gideon/config.json") as json_file:
+# Variables
+lesson = 0
+days = []
+lessons = []
+lessons_hours = []
+day = 0
+hours = 0
+minutes = 0
+time = 0
+
+# Loadin json file
+with open("C://repos/Gideon/config.json", encoding="utf-8") as json_file:
     data = json.load(json_file)
+
+# Loading timetable from json file
+for i in range(len(data["timetable"])):
+    days.append(data["timetable"][i]["day"])
+    lessons.append([])
+    for j in range(len(data["timetable"][i]["lessons"])):
+        lessons[i].append(data["timetable"][i]["lessons"][j])
+
+# Loading hours from json file
+lessons_hours = data["hours"]
+
+# Loading lesson duration from json file
+lesson_duration = data["lesson_duration"]
 
 # Creating client
 client = discord.Client()
 
 # Bot settings
-BOT_SYNTAX = "."
+BOT_SYNTAX = data["syntax"]
 
-# Variables
-timetable = []
-days = []
-empty = []
+# Function that updates all variables like lesson number and etc
+
+
+def timeToMinutes(time):
+    hours = int(time.split(":")[0])
+    minutes = int(time.split(":")[1])
+    return hours*60 + minutes
+
+
+def updateTime():
+    global day, hours, minutes, time, lesson
+    day = (int(datetime.now().strftime('%d')) % len(days))-1
+    hours = int(datetime.now().strftime('%H'))
+    minutes = int(datetime.now().strftime('%M'))
+    time = hours*60+minutes
+    lesson = 0
+
+    for i in range(len(lessons[day])):
+        if(time > timeToMinutes(lessons_hours[i]) and time < (timeToMinutes(lessons_hours[i])+lesson_duration)):
+            lesson = i
 
 
 @client.event
@@ -34,34 +74,36 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    channel = message.channel
+    updateTime()  # Updating variables
+    channel = message.channel  # Reading messages
+
     if(message.content.startswith(BOT_SYNTAX)):
-        command = message.content[1:message.content.find(" ")]
-        params = message.content.split(" ")[1:]
-        if(command == "add"):
-            if(params[0] == "day"):
-                days.append(params[1])
-                timetable.append(empty)
-                print(timetable)
-                await message.channel.send("Succesfully added new day `" + days[len(days)-1] + "`")
-            if(params[0] == "lesson"):
-                print(int(params[1]))
-                timetable[int(params[1])].append(params[2])
-                print(timetable)
-        if(command == "remove"):
-            if(params[0] == "day"):
-                await message.channel.send("Succesfully deleted day `" + days[int(params[1])] + "`")
-                days.pop(int(params[1]))
-                timetable.pop(int(params[1]))
-        if(command == "show"):
-            if(params[0] == "days"):
-                response = ""
-                for i in range(len(days)):
-                    response += str(i) + ". `" + days[i] + "`\n"
-                if(response == ""):
-                    await message.channel.send("You haven't added any days yet!")
-                else:
-                    await message.channel.send(response)
+        if(message.content.find(" ") == -1):
+            command = message.content.split(" ")[0][1:]
+
+            if(command == "plan"):
+                reponse = ":calendar: `" + days[day] + "`\n"
+                for i in range(len(lessons[day])):
+                    reponse += ":clock1: `" + lessons_hours[i] + \
+                        " - " + str((timeToMinutes(lessons_hours[i])+lesson_duration)//60) + \
+                        ":" + str((timeToMinutes(lessons_hours[i])+lesson_duration) % 60).zfill(2) + "` ▫ `" + \
+                        lessons[day][i] + "`\n"
+                await message.channel.send(reponse)
+
+            if(command == "ilelekcji"):
+                lesson_end = timeToMinutes(lessons_hours[lesson]) + 45
+                reponse = "`" + lessons[day][lesson] + \
+                    "` kończy się o `" + \
+                    str(lesson_end//60) + ":" + \
+                    str(lesson_end % 60).zfill(2) + "`\n" + \
+                    "Zostało `" + str(lesson_end-time) + \
+                    "`minut do końca lekcji"
+                await message.channel.send(reponse)
+
+            if(command == "czas"):
+                response = str(day) + "\n" + str(lesson) + \
+                    "\n" + lessons[day][lesson]
+                await message.channel.send(response)
 
 # Running bot with TOKEN
 client.run(TOKEN)

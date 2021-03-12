@@ -1,11 +1,22 @@
 {
+    "syntax": ",",
+    "lesson_duration": 5,
+    "hours": [
+        "15:30",
+        "15:40",
+        "15:50",
+        "16:00",
+        "16:10",
+        "16:20",
+        "16:30",
+        "16:40"
+    ],
     "timetable": [
         {
             "day": "Poniedziałek",
-            "day_number": 0,
             "lessons": [
-                "Mateamtyka",
-                "Mateamtyka",
+                "Matematyka",
+                "Matematyka",
                 "Filozofia",
                 "Wos",
                 "Polski",
@@ -16,7 +27,6 @@
         },
         {
             "day": "Wtorek",
-            "day_number": 1,
             "lessons": [
                 "",
                 "Polski",
@@ -30,7 +40,6 @@
         },
         {
             "day": "Środa",
-            "day_number": 2,
             "lessons": [
                 "Angielski",
                 "Mateamtyka",
@@ -43,9 +52,8 @@
         },
         {
             "day": "Czwartek",
-            "day_number": 3,
             "lessons": [
-                "Mateamtyka",
+                "Matematyk",
                 "Niemiecki",
                 "Wychowawcza",
                 "Biologia",
@@ -57,17 +65,23 @@
         },
         {
             "day": "Piątek",
-            "day_number": 4,
             "lessons": [
-                "Mateamtyka",
-                "Mateamtyka",
-                "Filozofia",
-                "Wos",
-                "Polski",
-                "Polski",
-                "Religia",
-                "Niemiecki"
+                "Angielski",
+                "Wf",
+                "Chemia",
+                "Fizyka",
+                "Angielski",
+                "Test",
+                "test"
             ]
+        },
+        {
+            "day": "Sobota",
+            "lessons": []
+        },
+        {
+            "day": "Niedziela",
+            "lessons": []
         }
     ]
 }
