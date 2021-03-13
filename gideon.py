@@ -6,14 +6,14 @@ import json
 from datetime import datetime
 import os
 
-DIR = os.path.abspath(__file__)
+DIR = "C://repos/Gideon"
 
 # Credentials
 load_dotenv(DIR + "/.env")
 TOKEN = os.getenv("TOKEN")
 
 # Variables
-lesson = 0
+lesson = -1
 days = []
 lessons = []
 lessons_hours = []
@@ -21,6 +21,7 @@ day = 0
 hours = 0
 minutes = 0
 time = 0
+day_status = "weekend"
 
 # Loadin json file
 with open(DIR + "/config.json", encoding="utf-8") as json_file:
@@ -60,11 +61,22 @@ def updateTime():
     hours = int(datetime.now().strftime('%H'))
     minutes = int(datetime.now().strftime('%M'))
     time = hours*60+minutes
-    lesson = 0
+    lesson = -1
+
+    day = 0
 
     for i in range(len(lessons[day])):
         if(time > timeToMinutes(lessons_hours[i]) and time < (timeToMinutes(lessons_hours[i])+lesson_duration)):
             lesson = i
+
+    lesson = 1
+
+    if(len(lessons[day]) == 0):
+        day_status = "weekend"
+    elif(lesson == -1):
+        day_status = "break"
+    else:
+        day_status = "lesson"
 
 
 @client.event
@@ -79,11 +91,21 @@ async def on_message(message):
     updateTime()  # Updating variables
     channel = message.channel  # Reading messages
 
+    # Updating status
+    activity = data["statuses"][day_status]["text"].replace(
+        "{lesson}", lessons[day][lesson])
+    activity = activity.replace("{next-lesson}", lessons[day][lesson])
+    if(data["statuses"][day_status]["status"] == "online"):
+        status = discord.Status.online
+    else:
+        status = discord.Status.idle
+    await client.change_presence(status=status, activity=discord.Game(activity))
+
     if(message.content.startswith(BOT_SYNTAX)):
         if(message.content.find(" ") == -1):
             command = message.content.split(" ")[0][1:]
 
-            if(command == "plan"):
+            if(command == "timetable"):
                 reponse = ":calendar: `" + days[day] + "`\n"
                 for i in range(len(lessons[day])):
                     reponse += ":clock1: `" + lessons_hours[i] + \
@@ -92,7 +114,7 @@ async def on_message(message):
                         lessons[day][i] + "`\n"
                 await message.channel.send(reponse)
 
-            if(command == "ilelekcji"):
+            if(command == "timeuntilend" or command == "tud"):
                 lesson_end = timeToMinutes(lessons_hours[lesson]) + 45
                 reponse = "`" + lessons[day][lesson] + \
                     "` kończy się o `" + \
@@ -102,9 +124,17 @@ async def on_message(message):
                     "`minut do końca lekcji"
                 await message.channel.send(reponse)
 
-            if(command == "czas"):
+            if(command == "time"):
                 response = str(day) + "\n" + str(lesson) + \
                     "\n" + lessons[day][lesson]
+                await message.channel.send(response)
+
+            if(command == "help"):
+                response = ":question: **Help** :question:\n"
+                response += "`" + data["syntax"] + \
+                    "timetable` ▫ sends the timetable\n"
+                response += "`" + data["syntax"] + "timeuntilend` or `" + data["syntax"] + \
+                    "tud` ▫ sends the remaining time of the lesson"
                 await message.channel.send(response)
 
 # Running bot with TOKEN

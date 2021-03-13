@@ -1,86 +1,95 @@
 {
     "syntax": ",",
-    "lesson_duration": 5,
+    "lesson_duration": 45,
+    "statuses": {
+        "weekend": {
+            "text": "It's weekend bro",
+            "status": "idle"
+        },
+        "lesson": {
+            "text": "{lesson}",
+            "status": "online"
+        },
+        "break": {
+            "text": "It's break time!",
+            "status": "idle"
+        }
+    },
     "hours": [
-        "15:30",
-        "15:40",
-        "15:50",
-        "16:00",
-        "16:10",
-        "16:20",
-        "16:30",
-        "16:40"
+        "8:00",
+        "8:50",
+        "9:40",
+        "10:40",
+        "11:30",
+        "12:30",
+        "13:20",
+        "14:10"
     ],
     "timetable": [
         {
-            "day": "Poniedziałek",
+            "day": "Monday",
             "lessons": [
-                "Matematyka",
-                "Matematyka",
-                "Filozofia",
-                "Wos",
-                "Polski",
-                "Polski",
-                "Religia",
-                "Niemiecki"
+                "Maths",
+                "Maths",
+                "Philosophy",
+                "Engilsh",
+                "English",
+                "Religion",
+                "German"
             ]
         },
         {
-            "day": "Wtorek",
+            "day": "Tuesday",
             "lessons": [
                 "",
-                "Polski",
-                "Edb",
-                "Historia",
-                "Matematyka",
-                "Angielski",
-                "Angielski",
-                "Informatyka"
+                "English",
+                "History",
+                "Maths",
+                "English",
+                "English",
+                "Informatics"
             ]
         },
         {
-            "day": "Środa",
+            "day": "Wednesday",
             "lessons": [
-                "Angielski",
-                "Mateamtyka",
-                "Historia",
-                "Geografia",
-                "Fizyka",
-                "Religia",
-                "Informatyka"
+                "English",
+                "Maths",
+                "History",
+                "Geography",
+                "Physics",
+                "Religion",
+                "Informatics"
             ]
         },
         {
-            "day": "Czwartek",
+            "day": "Thursday",
             "lessons": [
-                "Matematyk",
-                "Niemiecki",
-                "Wychowawcza",
-                "Biologia",
-                "Wf",
-                "Wf",
-                "Polski",
-                "Infomratyka"
+                "Maths",
+                "German",
+                "Biology",
+                "PE",
+                "PE",
+                "English",
+                "Informatics"
             ]
         },
         {
-            "day": "Piątek",
+            "day": "Friday",
             "lessons": [
-                "Angielski",
-                "Wf",
-                "Chemia",
-                "Fizyka",
-                "Angielski",
-                "Test",
-                "test"
+                "English",
+                "PE",
+                "Chemistry",
+                "Physcics",
+                "English"
             ]
         },
         {
-            "day": "Sobota",
+            "day": "Saturday",
             "lessons": []
         },
         {
-            "day": "Niedziela",
+            "day": "Sunday",
             "lessons": []
         }
     ]
