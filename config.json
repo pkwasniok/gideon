@@ -1,17 +1,18 @@
 {
     "syntax": ",",
     "lesson_duration": 45,
+    "info-channel-id": 814024741014601732,
     "statuses": {
         "weekend": {
             "text": "It's weekend bro",
             "status": "idle"
         },
         "lesson": {
-            "text": "{lesson}",
+            "text": "{lesson} {time-until-lesson-end}min left",
             "status": "online"
         },
         "break": {
-            "text": "It's break time!",
+            "text": "It's break time! {next-lesson}",
             "status": "idle"
         }
     },
@@ -29,8 +30,8 @@
         {
             "day": "Poniedziałek",
             "lessons": [
-                "Matematyka",
-                "Matematyka",
+                "Matematyka{amy-ikmf-wiv}",
+                "Matematyka{amy-ikmf-wiv}",
                 "Filozofia",
                 "Wos",
                 "Polski",
@@ -46,42 +47,42 @@
                 "Polski",
                 "Edb",
                 "Historia",
-                "Matematyka",
+                "Matematyka{hbw-ghcn-vur}",
                 "Angielski",
                 "Angielski",
-                "Informatyka"
+                "Informatyka{upp-hsht-rey}"
             ]
         },
         {
             "day": "Środa",
             "lessons": [
                 "Angielski",
-                "Matematyka",
+                "Matematyka{exy-ztmh-kmk}",
                 "Historia",
                 "Geografia",
                 "Fizyka/Biologia",
                 "Religia",
-                "Informatyka"
+                "Informatyka{nhb-frbq-qeh}"
             ]
         },
         {
             "day": "Czwartek",
             "lessons": [
-                "Matematyka",
+                "Matematyka{dqr-oaeg-psw}",
                 "Niemiecki",
                 "Wychowawcza",
                 "Biologia/Fizyka",
-                "Wf",
-                "Wf",
+                "Wf{vvc-ruha-aqk}",
+                "Wf{vvc-ruha-aqk}",
                 "Angielski",
-                "Informatyka"
+                "Informatyka{cmv-hjhx-qou}"
             ]
         },
         {
             "day": "Piątek",
             "lessons": [
                 "Angielski",
-                "Wf",
+                "Wf{vvc-ruha-aqk}",
                 "Chemia",
                 "Fizyka",
                 "Angielski"
