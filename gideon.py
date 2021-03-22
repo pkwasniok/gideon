@@ -26,10 +26,21 @@ hours = 0
 minutes = 0
 time = 0
 day_status = "weekend"
+date_day = 0
+date_month = 0
+date_year = 0
+reminders_state = False
+reminders = []
+
+last_channel = None
 
 # Loading json file
 with open(DIR + "/config.json", encoding="utf-8") as json_file:
     data = json.load(json_file)
+
+# Loading remidners setting
+reminders_state = data['reminders']
+reminders = []
 
 # Loading timetable from json file
 for i in range(len(data["timetable"])):
@@ -67,6 +78,9 @@ BOT_SYNTAX = data["syntax"]
 with open(DIR + "/events.json", encoding="utf-8") as json_file:
     events = json.load(json_file)
 
+for i in range(len(events['events'])):
+    reminders.append(False)
+
 
 def lessonToIndex(lesson):  # unkcja konwertująca nazwę lekcji na numer(index) lekcji
     i = -1
@@ -84,8 +98,11 @@ def timeToMinutes(time):  # Funkcja konwertująca czas z formatu "HH:MM" na minu
 
 
 async def updateTime():  # Funkajc aktualizująca czas, numer] lekcji, itp.
-    global day, hours, minutes, time, lesson, break_number, day_status
+    global day, hours, minutes, time, lesson, break_number, day_status, date_day, date_month, date_year, last_channel
     day = (int(datetime.now().strftime('%d')) % (len(days)))-1
+    date_month = (int(datetime.now().strftime('%m')))
+    date_day = int(datetime.now().strftime('%d'))
+    date_year = int(datetime.now().strftime('%Y'))
     hours = int(datetime.now().strftime('%H'))
     minutes = int(datetime.now().strftime('%M'))
     time = hours*60+minutes
@@ -125,11 +142,31 @@ async def updateTime():  # Funkajc aktualizująca czas, numer] lekcji, itp.
         hours_to_event = (event_time-time)//60
         minutes_to_event = (event_time-time) % 60
 
-        time_to_end = event_time-time
+        event_day = int(events['events'][i]['date'].split('/')[0])
+        event_month = int(events['events'][i]['date'].split('/')[1])
+        event_year = int(events['events'][i]['date'].split('/')[2])
 
-        if((abs(time_to_end)//60) >= int(data['event-expire-time']) and time_to_end < 0):
-            print("usunięto wydarzenie")
-            events['events'].pop(i)
+        time_to_event = event_time-time
+
+        if(event_day <= date_day and event_month <= date_month and event_year <= date_year):
+            if(abs(time_to_event) >= int(data['event-expire-time'])*60 and time_to_event < 0):
+                events['events'].pop(i)
+
+        if(event_day == date_day and event_month == date_month and event_year == date_year):
+            reminder = 12345
+            if(events['events'][i]['reminder'][-1] == 'h'):
+                reminder = int(events['events'][i]['reminder'][:-1])*60
+            elif(events['events'][i]['reminder'][-1] == 'm'):
+                reminder = int(events['events'][i]['reminder'][:-1])
+
+            if(reminders[i] == False and (event_time-reminder)-time == 0):
+                reminders[i] = True
+                if(last_channel != None):
+                    response = "Przypomnienie! " + events['events'][i]['name']
+                    print("REMINDER")
+                    await last_channel.send(response)
+
+            print((event_time-reminder)-time)
 
     with open(DIR + '/events.json', 'w') as outfile:
         json.dump(events, outfile)
@@ -152,10 +189,12 @@ async def on_ready():  # Po dołączeniu na serwer (włączeniu bota)
 
 @ client.event
 async def on_message(message):
+    global last_channel
     await updateTime()  # Updating variables
     channel = message.channel  # Reading messages
 
     if(message.content.startswith(BOT_SYNTAX)):
+        last_channel = message.channel
         if(message.content.find(" ") == -1):
             # Extracting command from message
             command = message.content.split(" ")[0][1:]
@@ -320,10 +359,16 @@ async def on_message(message):
                 # getting desc from message
                 desc = message.content.split("\"")[1]
 
+                if(args[2].lower() == "dzisiaj"):
+                    date = str(date_day) + '/' + str(date_month) + \
+                        '/' + str(date_year)
+                else:
+                    date = args[2]
+
                 dict = {
                     "name": args[0],
                     "time": args[1],
-                    "date": args[2],
+                    "date": date,
                     "reminder": args[3],
                     "subject": args[4],
                     "description": desc
