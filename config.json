@@ -2,6 +2,7 @@
     "syntax": ",",
     "lesson_duration": 45,
     "info-channel-id": 814024741014601732,
+    "event-expire-time": "1",
     "statuses": {
         "weekend": {
             "text": "It's weekend bro",

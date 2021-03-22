@@ -63,6 +63,10 @@ client = discord.Client()
 # Setting bot syntax (from config.json)
 BOT_SYNTAX = data["syntax"]
 
+# Loading events from events.json
+with open(DIR + "/events.json", encoding="utf-8") as json_file:
+    events = json.load(json_file)
+
 
 def lessonToIndex(lesson):  # unkcja konwertująca nazwę lekcji na numer(index) lekcji
     i = -1
@@ -223,8 +227,25 @@ async def on_message(message):
                     name=BOT_SYNTAX+"ilelekcji | " + BOT_SYNTAX+"il", value="Wyświetla czas pozostały do końca aktualnej lekcji/przerwy", inline=False)
                 embed.add_field(
                     name=BOT_SYNTAX+"ileczasu | " + BOT_SYNTAX+"ic", value="Wyświetla czas pozostały do końca wszystkich lekcji", inline=False)
+                embed.add_field(
+                    name=BOT_SYNTAX+"dodaj <nazwa> <godzina> <data> <przypomnienie> <przedmiot> <\"opis\">", value="Dodaje nowe wydarzenie", inline=False)
                 await message.channel.send(embed=embed)
 
+            # ====wydarzenia====
+            if(command == "wydarzenia"):
+                embed = discord.Embed(
+                    title="Nadchodzące wydarzenia", color=0x0000ff)
+
+                for i in range(len(events['events'])):
+                    desc = "Godzina: " + events['events'][i]['time'] + "\n" + \
+                        "Data: " + events['events'][i]['date'] + "\n" + \
+                        "Przypomnienie: " + events['events'][i]['reminder'] + "\n" + \
+                        "Przedmiot: " + events['events'][i]['subject'] + "\n" + \
+                        "Opis: " + events['events'][i]['description']
+                    embed.add_field(
+                        name=events['events'][i]['name'], value=desc, inline=False)
+
+                await message.channel.send(embed=embed)
         else:
             # Extracting command and args from message
             command = message.content.split(" ")[0][1:]
@@ -269,6 +290,29 @@ async def on_message(message):
                         title=lessons[day][lessonToIndex(args[0])], description=desc, color=0x00ff00)
                     await message.channel.send(embed=embed)
 
+            # ====doda-event====
+            if(command == "dodaj"):
+                # getting desc from message
+                desc = message.content.split("\"")[1]
+
+                dict = {
+                    "name": args[0],
+                    "time": args[1],
+                    "date": args[2],
+                    "reminder": args[3],
+                    "subject": args[4],
+                    "description": desc
+                }
+
+                events['events'].append(dict)
+
+                with open(DIR + "/events.json", "r+", encoding="utf-8") as json_file:
+                    data = json.load(json_file)
+                    data.update(events)
+                    json_file.seek(0)
+                    json.dump(events, json_file)
+
+                await message.channel.send("Dodano wydarzenie " + events['events'][len(events['events'])-1]['name'])
 
 # Running bot with TOKEN
 client.run(TOKEN)
