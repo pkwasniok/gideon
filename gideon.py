@@ -119,6 +119,21 @@ async def updateTime():  # Funkajc aktualizująca czas, numer] lekcji, itp.
         status = discord.Status.idle
     await client.change_presence(status=status, activity=discord.Game(activity))
 
+    # Updating events
+    for i in range(len(events['events'])):
+        event_time = timeToMinutes(events['events'][i]['time'])
+        hours_to_event = (event_time-time)//60
+        minutes_to_event = (event_time-time) % 60
+
+        time_to_end = event_time-time
+
+        if((abs(time_to_end)//60) >= int(data['event-expire-time']) and time_to_end < 0):
+            print("usunięto wydarzenie")
+            events['events'].pop(i)
+
+    with open(DIR + '/events.json', 'w') as outfile:
+        json.dump(events, outfile)
+
 
 @ tasks.loop(seconds=20)
 async def sync():  # Pętal w której uakualniany jest czas, lekcja, wysyłane są powiadomienia
@@ -229,6 +244,8 @@ async def on_message(message):
                     name=BOT_SYNTAX+"ileczasu | " + BOT_SYNTAX+"ic", value="Wyświetla czas pozostały do końca wszystkich lekcji", inline=False)
                 embed.add_field(
                     name=BOT_SYNTAX+"dodaj <nazwa> <godzina> <data> <przypomnienie> <przedmiot> <\"opis\">", value="Dodaje nowe wydarzenie", inline=False)
+                embed.add_field(
+                    name=BOT_SYNTAX+"wydarzenia", value="Wyświetla listę wszystkich wydarzeń", inline=False)
                 await message.channel.send(embed=embed)
 
             # ====wydarzenia====
@@ -246,6 +263,14 @@ async def on_message(message):
                         name=events['events'][i]['name'], value=desc, inline=False)
 
                 await message.channel.send(embed=embed)
+
+            # ====debug====
+            if(command == "debug"):
+                even_time = timeToMinutes(events['events'][0]['time'])
+                hours_to_event = (even_time-time)//60
+                minutes_to_event = (even_time-time) % 60
+
+                print(str(hours_to_event) + ":" + str(minutes_to_event))
         else:
             # Extracting command and args from message
             command = message.content.split(" ")[0][1:]
@@ -290,7 +315,7 @@ async def on_message(message):
                         title=lessons[day][lessonToIndex(args[0])], description=desc, color=0x00ff00)
                     await message.channel.send(embed=embed)
 
-            # ====doda-event====
+            # ====dodaj-event====
             if(command == "dodaj"):
                 # getting desc from message
                 desc = message.content.split("\"")[1]
@@ -306,11 +331,8 @@ async def on_message(message):
 
                 events['events'].append(dict)
 
-                with open(DIR + "/events.json", "r+", encoding="utf-8") as json_file:
-                    data = json.load(json_file)
-                    data.update(events)
-                    json_file.seek(0)
-                    json.dump(events, json_file)
+                with open(DIR + '/events.json', 'w') as outfile:
+                    json.dump(events, outfile)
 
                 await message.channel.send("Dodano wydarzenie " + events['events'][len(events['events'])-1]['name'])
 
