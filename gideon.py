@@ -44,7 +44,6 @@ for i in range(len(data["timetable"])):
 
 # Loading meet links from json file
 for i in range(len(data["timetable"])):
-    days.append(data["timetable"][i]["day"])
     links.append([])
     for j in data["timetable"][i]["lessons"]:
         if(j.find("{") != -1 and j.find("}") != -1):
@@ -82,13 +81,13 @@ def timeToMinutes(time):  # Funkcja konwertująca czas z formatu "HH:MM" na minu
 
 async def updateTime():  # Funkajc aktualizująca czas, numer] lekcji, itp.
     global day, hours, minutes, time, lesson, break_number, day_status
-    day = (int(datetime.now().strftime('%d')) % len(days))-1
+    day = (int(datetime.now().strftime('%d')) % (len(days)))-1
     hours = int(datetime.now().strftime('%H'))
     minutes = int(datetime.now().strftime('%M'))
     time = hours*60+minutes
     lesson = -1
 
-    for i in range(len(lessons[day])):
+    for i in range(len(lessons[day])-1):
         if(time >= timeToMinutes(lessons_hours[i]) and time < (timeToMinutes(lessons_hours[i])+lesson_duration)):
             lesson = i
 
@@ -178,8 +177,7 @@ async def on_message(message):
                     await message.channel.send(response)
                 else:
                     lesson_end = timeToMinutes(lessons_hours[lesson]) + 45
-                    reponse = "`" + lessons[day][lesson] + \
-                        "` kończy się o `" + \
+                    reponse = "`" + lessons[day][lesson] + "` kończy się o `" + \
                         str(lesson_end//60).zfill(2) + ":" + \
                         str(lesson_end % 60).zfill(2) + "`\n" + \
                         "Zostało `" + str(lesson_end-time) + \
@@ -233,11 +231,17 @@ async def on_message(message):
             args = message.content.split(" ")[1:]
 
             # ====plan-day====
-            if(command == "plan" and len(args) == 1):
+            if(command == "plan" and (len(args) == 1 or len(args) == 2)):
+                arg_num = 0
+                if(args[0].lower() == 'na'):
+                    arg_num = 1
+
                 day_number = -1
                 for day_number in range(len(data["timetable"])):
-                    if(data["timetable"][day_number]["day"].lower() == args[0].lower()):
+                    if(data["timetable"][day_number]["day"][:-1].lower() == args[arg_num][:-1].lower()):
                         break
+                if(args[arg_num].lower() == "jutro"):
+                    day_number = day+1
                 if(day_number != -1):
                     response = ":calendar: `" + days[day_number] + "`\n"
                     for i in range(len(lessons[day_number])):
