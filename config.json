@@ -2,7 +2,8 @@
     "syntax": ",",
     "lesson_duration": 45,
     "info-channel-id": 814024741014601732,
-    "event-expire-time": "1",
+    "event-expire-time": "10",
+    "news-channel-id": 822090746248167514,
     "reminders": true,
     "statuses": {
         "weekend": {

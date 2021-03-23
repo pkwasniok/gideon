@@ -73,6 +73,7 @@ client = discord.Client()
 
 # Setting bot syntax (from config.json)
 BOT_SYNTAX = data["syntax"]
+NEWS_CHANNEL_ID = data['news-channel-id']
 
 # Loading events from events.json
 with open(DIR + "/events.json", encoding="utf-8") as json_file:
@@ -139,35 +140,34 @@ async def updateTime():  # Funkajc aktualizująca czas, numer] lekcji, itp.
     # Updating events
     for i in range(len(events['events'])):
         event_time = timeToMinutes(events['events'][i]['time'])
-        hours_to_event = (event_time-time)//60
-        minutes_to_event = (event_time-time) % 60
-
         event_day = int(events['events'][i]['date'].split('/')[0])
         event_month = int(events['events'][i]['date'].split('/')[1])
         event_year = int(events['events'][i]['date'].split('/')[2])
 
-        time_to_event = event_time-time
+        if(event_day < date_day or event_month < date_month or event_year < date_year):
+            events['events'].pop(i)
 
-        if(event_day <= date_day and event_month <= date_month and event_year <= date_year):
-            if(abs(time_to_event) >= int(data['event-expire-time'])*60 and time_to_event < 0):
-                events['events'].pop(i)
+        if(event_time+int(data['event-expire-time']) <= time and (event_day == date_day and event_month == date_month and event_year == date_year)):
+            events['events'].pop(i)
 
+        # reminders
         if(event_day == date_day and event_month == date_month and event_year == date_year):
-            reminder = 12345
-            if(events['events'][i]['reminder'][-1] == 'h'):
-                reminder = int(events['events'][i]['reminder'][:-1])*60
-            elif(events['events'][i]['reminder'][-1] == 'm'):
-                reminder = int(events['events'][i]['reminder'][:-1])
+            event_reminder_time = int(
+                events['events'][i]['reminder'].split('/')[0])
+            event_reminded = events['events'][i]['reminder'].split('/')[1]
 
-            if(reminders[i] == False and (event_time-reminder)-time == 0):
-                reminders[i] = True
-                if(last_channel != None):
-                    response = "Przypomnienie! " + events['events'][i]['name']
-                    print("REMINDER")
-                    await last_channel.send(response)
+        event_reminded = event_reminded == "True"
 
-            print((event_time-reminder)-time)
+        if(event_reminded == True and time == event_time-event_reminder_time):
+            event_reminded = False
+            events['events'][i]['reminder'] = str(
+                event_reminder_time) + "/False"
+            channel = client.get_channel(NEWS_CHANNEL_ID)
+            embed = discord.Embed(
+                title="Przypomnienie", description=events['events'][i]['name'], color=0x0f0f0f)
+            await channel.send(embed=embed)
 
+        # Save to events.json
     with open(DIR + '/events.json', 'w') as outfile:
         json.dump(events, outfile)
 
@@ -293,15 +293,19 @@ async def on_message(message):
                     title="Nadchodzące wydarzenia", color=0x0000ff)
 
                 for i in range(len(events['events'])):
-                    desc = "Godzina: " + events['events'][i]['time'] + "\n" + \
-                        "Data: " + events['events'][i]['date'] + "\n" + \
-                        "Przypomnienie: " + events['events'][i]['reminder'] + "\n" + \
-                        "Przedmiot: " + events['events'][i]['subject'] + "\n" + \
-                        "Opis: " + events['events'][i]['description']
+                    desc = ":clock1: " + events['events'][i]['time'] + "\n" + \
+                        ":calendar: " + events['events'][i]['date'] + "\n" + \
+                        ":bell: " + events['events'][i]['reminder'] + " min\n" + \
+                        ":pen_ballpoint: " + events['events'][i]['subject'] + "\n" + \
+                        ":page_facing_up: " + \
+                        events['events'][i]['description']
                     embed.add_field(
                         name=events['events'][i]['name'], value=desc, inline=False)
 
                 await message.channel.send(embed=embed)
+
+            if(command == "stolat"):
+                await message.channel.send("Dziękuję!")
 
             # ====debug====
             if(command == "debug"):
@@ -369,7 +373,7 @@ async def on_message(message):
                     "name": args[0],
                     "time": args[1],
                     "date": date,
-                    "reminder": args[3],
+                    "reminder": args[3]+"/True",
                     "subject": args[4],
                     "description": desc
                 }

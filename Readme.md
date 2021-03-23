@@ -1,4 +1,5 @@
 # Gideon
+<img src="https://img.shields.io/badge/Language-PL-red"/>
 ## Installation
 1. First you need to download files using:
 `git clone https://github.com/pkwasniok/gideon`
